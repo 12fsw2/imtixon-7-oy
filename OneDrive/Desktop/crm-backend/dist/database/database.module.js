@@ -27,7 +27,7 @@ exports.DatabaseModule = DatabaseModule = __decorate([
                     password: configService.get('database.password'),
                     database: configService.get('database.database'),
                     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-                    synchronize: configService.get('app.nodeEnv') !== 'production',
+                    synchronize: false,
                     logging: configService.get('app.nodeEnv') === 'development',
                     migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
                 }),

@@ -8,7 +8,7 @@ import { Role } from '../common/enums/role.enum';
 import { createApiResponse } from '../common/interfaces/api-response.interface';
 
 @ApiTags('Reports')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.SUPER_ADMIN, Role.ADMIN)
 @Controller('reports')

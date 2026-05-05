@@ -32,7 +32,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { createApiResponse } from '../common/interfaces/api-response.interface';
 
 @ApiTags('Tasks')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tasks')
 export class TasksController {

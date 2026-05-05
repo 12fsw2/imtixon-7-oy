@@ -32,7 +32,7 @@ import { Role } from '../common/enums/role.enum';
 import { createApiResponse } from '../common/interfaces/api-response.interface';
 
 @ApiTags('Departments')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('departments')
 export class DepartmentsController {

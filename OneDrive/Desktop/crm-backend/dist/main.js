@@ -40,24 +40,20 @@ async function bootstrap() {
 
 ### Authentication
 - Use \`/api/v1/auth/login\` to get access token
-- Click "Authorize" button and enter: \`Bearer <your_token>\`
+- Click "Authorize" button and enter JWT token (Bearer avtomatik qoshiladi)
 
 ### Roles
 - **SUPER_ADMIN**: Full access - create users, assign roles, view statistics
 - **ADMIN**: Manage employees, departments, tasks, view reports  
 - **EMPLOYEE**: View own tasks and profile
-
-### Default Super Admin
-- Email: \`superadmin@company.com\`
-- Password: \`SuperAdmin@123\`
       `)
         .setVersion('1.0.0')
         .addBearerAuth({
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
+        name: 'Authorization',
+        description: 'Faqat tokenni kiriting (Bearer avtomatik qoshiladi)',
         in: 'header',
     }, 'JWT-auth')
         .addTag('Authentication', 'Login and auth endpoints')
@@ -72,13 +68,17 @@ async function bootstrap() {
             persistAuthorization: true,
             tagsSorter: 'alpha',
             operationsSorter: 'alpha',
+            docExpansion: 'none',
+            filter: true,
+            showRequestDuration: true,
         },
         customSiteTitle: 'CRM-SRM API Docs',
     });
-    await app.listen(port);
-    logger.log(`🚀 Application running on: http://localhost:${port}/api/v1`);
-    logger.log(`📚 Swagger docs available at: http://localhost:${port}/api/docs`);
-    logger.log(`🌍 Environment: ${nodeEnv}`);
+    const PORT = process.env.PORT ?? 3000;
+    await app.listen(PORT, () => {
+        console.log(`🚀 Root api for project: http://localhost:${PORT}/api/v1`);
+        console.log(`📚 Swagger docs: http://localhost:${PORT}/api/docs`);
+    });
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

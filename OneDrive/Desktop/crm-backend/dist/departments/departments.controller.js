@@ -123,7 +123,7 @@ __decorate([
 ], DepartmentsController.prototype, "removeEmployee", null);
 exports.DepartmentsController = DepartmentsController = __decorate([
     (0, swagger_1.ApiTags)('Departments'),
-    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('departments'),
     __metadata("design:paramtypes", [departments_service_1.DepartmentsService])

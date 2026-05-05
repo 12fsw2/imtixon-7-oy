@@ -44,7 +44,7 @@ export class AuthController {
   @Post('register')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Register new user (Super Admin only)' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   async register(@Body() createUserDto: CreateUserDto) {
@@ -54,7 +54,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current authenticated user' })
   async me(@CurrentUser() user: any) {
     return createApiResponse('Current user retrieved', user);
