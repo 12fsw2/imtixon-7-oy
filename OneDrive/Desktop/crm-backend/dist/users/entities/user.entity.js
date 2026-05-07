@@ -57,23 +57,6 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "departmentId", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)('Department', 'employees', { nullable: true, onDelete: 'SET NULL' }),
-    (0, typeorm_1.JoinColumn)({ name: 'departmentId' }),
-    __metadata("design:type", Object)
-], User.prototype, "department", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)('Task', 'assignee'),
-    __metadata("design:type", Array)
-], User.prototype, "assignedTasks", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)('Task', 'createdBy'),
-    __metadata("design:type", Array)
-], User.prototype, "createdTasks", void 0);
-__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);

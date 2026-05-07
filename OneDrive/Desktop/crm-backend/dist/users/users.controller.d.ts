@@ -13,7 +13,8 @@ export declare class UsersController {
         byRole: {
             superAdmins: number;
             admins: number;
-            employees: number;
+            teachers: number;
+            cashiers: number;
         };
     }>>;
     findOne(id: string): Promise<import("../common/interfaces/api-response.interface").ApiResponse<import("./entities/user.entity").User>>;

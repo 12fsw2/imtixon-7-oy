@@ -16,196 +16,123 @@ exports.ReportsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const student_entity_1 = require("../students/entities/student.entity");
+const group_entity_1 = require("../groups/entities/group.entity");
+const payment_entity_1 = require("../payments/entities/payment.entity");
+const attendance_entity_1 = require("../attendance/entities/attendance.entity");
 const user_entity_1 = require("../users/entities/user.entity");
-const task_entity_1 = require("../tasks/entities/task.entity");
-const department_entity_1 = require("../departments/entities/department.entity");
-const role_enum_1 = require("../common/enums/role.enum");
-const task_enum_1 = require("../common/enums/task.enum");
 let ReportsService = class ReportsService {
-    constructor(userRepository, taskRepository, departmentRepository) {
+    constructor(studentRepository, groupRepository, paymentRepository, attendanceRepository, userRepository) {
+        this.studentRepository = studentRepository;
+        this.groupRepository = groupRepository;
+        this.paymentRepository = paymentRepository;
+        this.attendanceRepository = attendanceRepository;
         this.userRepository = userRepository;
-        this.taskRepository = taskRepository;
-        this.departmentRepository = departmentRepository;
     }
     async getDashboard() {
-        const [userStats, taskStats, departmentStats, recentTasks, topPerformers] = await Promise.all([
-            this.getUserStats(),
-            this.getTaskStats(),
-            this.getDepartmentStats(),
-            this.getRecentTasks(5),
-            this.getTopPerformers(5),
+        const [studentStats, teacherCount, groupStats, paymentStats, monthlyStats] = await Promise.all([
+            this.getStudentStats(),
+            this.getTeacherCount(),
+            this.getGroupStats(),
+            this.getPaymentStats(),
+            this.getMonthlyStats(),
         ]);
         return {
-            users: userStats,
-            tasks: taskStats,
-            departments: departmentStats,
-            recentTasks,
-            topPerformers,
+            students: studentStats,
+            teachers: teacherCount,
+            groups: groupStats,
+            payments: paymentStats,
+            monthlyStats,
         };
     }
-    async getUserStats() {
-        const stats = await this.userRepository
-            .createQueryBuilder('user')
+    async getStudentStats() {
+        const stats = await this.studentRepository
+            .createQueryBuilder('student')
             .select([
             'COUNT(*) as total',
-            `SUM(CASE WHEN user.isActive = true THEN 1 ELSE 0 END) as active`,
-            `SUM(CASE WHEN user.role = '${role_enum_1.Role.ADMIN}' THEN 1 ELSE 0 END) as admins`,
-            `SUM(CASE WHEN user.role = '${role_enum_1.Role.EMPLOYEE}' THEN 1 ELSE 0 END) as employees`,
-            `SUM(CASE WHEN user.createdAt >= NOW() - INTERVAL '30 days' THEN 1 ELSE 0 END) as newThisMonth`,
+            `SUM(CASE WHEN student.status = 'ACTIVE' THEN 1 ELSE 0 END) as active`,
+            `SUM(CASE WHEN student.status = 'INACTIVE' THEN 1 ELSE 0 END) as leftThisMonth`,
+            `SUM(CASE WHEN student.createdAt >= NOW() - INTERVAL '30 days' THEN 1 ELSE 0 END) as newThisMonth`,
         ])
             .getRawOne();
         return {
             total: parseInt(stats.total),
             active: parseInt(stats.active),
-            admins: parseInt(stats.admins),
-            employees: parseInt(stats.employees),
+            leftThisMonth: parseInt(stats.leftthismonth),
             newThisMonth: parseInt(stats.newthismonth),
         };
     }
-    async getTaskStats() {
-        const stats = await this.taskRepository
-            .createQueryBuilder('task')
+    async getTeacherCount() {
+        const count = await this.userRepository
+            .createQueryBuilder('user')
+            .where('user.role = :role', { role: 'TEACHER' })
+            .andWhere('user.isActive = true')
+            .getCount();
+        return { total: count };
+    }
+    async getGroupStats() {
+        const stats = await this.groupRepository
+            .createQueryBuilder('group')
             .select([
             'COUNT(*) as total',
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.TODO}' THEN 1 ELSE 0 END) as todo`,
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.IN_PROGRESS}' THEN 1 ELSE 0 END) as inProgress`,
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.DONE}' THEN 1 ELSE 0 END) as done`,
-            `SUM(CASE WHEN task.dueDate < NOW() AND task.status NOT IN ('DONE', 'CANCELLED') THEN 1 ELSE 0 END) as overdue`,
-            `SUM(CASE WHEN task.createdAt >= NOW() - INTERVAL '30 days' THEN 1 ELSE 0 END) as createdThisMonth`,
-            `SUM(CASE WHEN task.completedAt >= NOW() - INTERVAL '30 days' THEN 1 ELSE 0 END) as completedThisMonth`,
+            `SUM(CASE WHEN group.status = 'ACTIVE' THEN 1 ELSE 0 END) as active`,
+            `SUM(CASE WHEN group.status = 'COMPLETED' THEN 1 ELSE 0 END) as completed`,
         ])
             .getRawOne();
         return {
             total: parseInt(stats.total),
-            todo: parseInt(stats.todo),
-            inProgress: parseInt(stats.inprogress),
-            done: parseInt(stats.done),
-            overdue: parseInt(stats.overdue),
-            createdThisMonth: parseInt(stats.createdthismonth),
-            completedThisMonth: parseInt(stats.completedthismonth),
+            active: parseInt(stats.active),
+            completed: parseInt(stats.completed),
         };
     }
-    async getDepartmentStats() {
-        const stats = await this.departmentRepository
-            .createQueryBuilder('dept')
-            .loadRelationCountAndMap('dept.employeeCount', 'dept.employees')
-            .loadRelationCountAndMap('dept.taskCount', 'dept.tasks')
-            .select(['dept.id', 'dept.name', 'dept.isActive'])
-            .getMany();
-        return {
-            total: stats.length,
-            active: stats.filter((d) => d.isActive).length,
-            list: stats,
-        };
-    }
-    async getRecentTasks(limit) {
-        return this.taskRepository
-            .createQueryBuilder('task')
-            .leftJoin('task.assignee', 'assignee')
-            .addSelect(['assignee.id', 'assignee.firstName', 'assignee.lastName'])
-            .orderBy('task.createdAt', 'DESC')
-            .take(limit)
-            .getMany();
-    }
-    async getTopPerformers(limit) {
-        return this.userRepository
-            .createQueryBuilder('user')
-            .leftJoin('user.assignedTasks', 'task', `task.status = '${task_enum_1.TaskStatus.DONE}'`)
+    async getPaymentStats() {
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const stats = await this.paymentRepository
+            .createQueryBuilder('payment')
             .select([
-            'user.id',
-            'user.firstName',
-            'user.lastName',
-            'user.email',
-            'COUNT(task.id) as completedTasks',
+            'SUM(payment.paidAmount) as totalPaid',
+            'SUM(payment.amount) as totalAmount',
+            `SUM(CASE WHEN payment.month = '${currentMonth}' THEN payment.paidAmount ELSE 0 END) as thisMonthPaid`,
+            `SUM(CASE WHEN payment.status = 'OVERDUE' THEN payment.amount - payment.paidAmount ELSE 0 END) as totalDebt`,
         ])
-            .where('user.role = :role', { role: role_enum_1.Role.EMPLOYEE })
-            .groupBy('user.id')
-            .orderBy('completedTasks', 'DESC')
-            .take(limit)
-            .getRawMany();
-    }
-    async getActivityReport(query) {
-        const { startDate, endDate, departmentId, page = 1, limit = 20 } = query;
-        const qb = this.taskRepository
-            .createQueryBuilder('task')
-            .leftJoin('task.assignee', 'assignee')
-            .leftJoin('task.department', 'department')
-            .addSelect([
-            'assignee.id',
-            'assignee.firstName',
-            'assignee.lastName',
-            'department.id',
-            'department.name',
-        ]);
-        if (startDate) {
-            qb.andWhere('task.createdAt >= :startDate', { startDate: new Date(startDate) });
-        }
-        if (endDate) {
-            qb.andWhere('task.createdAt <= :endDate', { endDate: new Date(endDate) });
-        }
-        if (departmentId) {
-            qb.andWhere('task.departmentId = :departmentId', { departmentId });
-        }
-        qb.orderBy('task.createdAt', 'DESC');
-        qb.skip((page - 1) * limit).take(limit);
-        const [data, total] = await qb.getManyAndCount();
-        return {
-            data,
-            meta: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
-    }
-    async getDepartmentReport(departmentId) {
-        const department = await this.departmentRepository
-            .createQueryBuilder('dept')
-            .leftJoin('dept.employees', 'employee')
-            .leftJoin('dept.tasks', 'task')
-            .addSelect([
-            'employee.id',
-            'employee.firstName',
-            'employee.lastName',
-            'employee.role',
-            'task.id',
-            'task.title',
-            'task.status',
-            'task.priority',
-        ])
-            .where('dept.id = :departmentId', { departmentId })
-            .getOne();
-        if (!department)
-            return null;
-        const taskStats = await this.taskRepository
-            .createQueryBuilder('task')
-            .select([
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.DONE}' THEN 1 ELSE 0 END) as done`,
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.IN_PROGRESS}' THEN 1 ELSE 0 END) as inProgress`,
-            `SUM(CASE WHEN task.status = '${task_enum_1.TaskStatus.TODO}' THEN 1 ELSE 0 END) as todo`,
-            'COUNT(*) as total',
-        ])
-            .where('task.departmentId = :departmentId', { departmentId })
             .getRawOne();
         return {
-            department,
-            taskSummary: {
-                total: parseInt(taskStats.total),
-                done: parseInt(taskStats.done),
-                inProgress: parseInt(taskStats.inprogress),
-                todo: parseInt(taskStats.todo),
-            },
+            totalPaid: parseFloat(stats.totalpaid) || 0,
+            totalAmount: parseFloat(stats.totalamount) || 0,
+            thisMonthPaid: parseFloat(stats.thismontpaid) || 0,
+            totalDebt: parseFloat(stats.totaldebt) || 0,
         };
+    }
+    async getMonthlyStats() {
+        const stats = await this.studentRepository
+            .createQueryBuilder('student')
+            .select([
+            `TO_CHAR(student.createdAt, 'YYYY-MM') as month`,
+            'COUNT(*) as total',
+            `SUM(CASE WHEN student.status = 'INACTIVE' THEN 1 ELSE 0 END) as left`,
+        ])
+            .where(`student.createdAt >= NOW() - INTERVAL '6 months'`)
+            .groupBy(`TO_CHAR(student.createdAt, 'YYYY-MM')`)
+            .orderBy(`TO_CHAR(student.createdAt, 'YYYY-MM')`, 'ASC')
+            .getRawMany();
+        return stats.map(s => ({
+            month: s.month,
+            total: parseInt(s.total),
+            left: parseInt(s.left),
+        }));
     }
 };
 exports.ReportsService = ReportsService;
 exports.ReportsService = ReportsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(1, (0, typeorm_1.InjectRepository)(task_entity_1.Task)),
-    __param(2, (0, typeorm_1.InjectRepository)(department_entity_1.Department)),
+    __param(0, (0, typeorm_1.InjectRepository)(student_entity_1.Student)),
+    __param(1, (0, typeorm_1.InjectRepository)(group_entity_1.Group)),
+    __param(2, (0, typeorm_1.InjectRepository)(payment_entity_1.Payment)),
+    __param(3, (0, typeorm_1.InjectRepository)(attendance_entity_1.Attendance)),
+    __param(4, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], ReportsService);

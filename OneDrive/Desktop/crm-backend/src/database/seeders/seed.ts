@@ -14,7 +14,7 @@ async function seed() {
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_DATABASE || 'crm_srm_db',
     entities: [path.resolve(__dirname, '../../**/*.entity{.ts,.js}')],
-    synchronize: true,
+    synchronize: false,
   });
 
   try {
@@ -23,13 +23,13 @@ async function seed() {
 
     const userRepository = dataSource.getRepository('users');
 
-    // Check if super admin already exists
+    // Super Admin
     const existingSuperAdmin = await userRepository.findOne({
       where: { email: process.env.SUPER_ADMIN_EMAIL || 'superadmin@company.com' },
     });
 
     if (existingSuperAdmin) {
-      console.log('⚠️  Super Admin already exists, skipping seed');
+      console.log('⚠️  Super Admin already exists, skipping');
     } else {
       const hashedPassword = await bcrypt.hash(
         process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@123',
@@ -47,28 +47,31 @@ async function seed() {
       });
 
       await userRepository.save(superAdmin);
-      console.log('✅ Super Admin created successfully!');
+      console.log('✅ Super Admin yaratildi!');
       console.log(`   Email: ${superAdmin.email}`);
       console.log(`   Password: ${process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@123'}`);
     }
 
-    // Seed sample departments
-    const departmentRepository = dataSource.getRepository('departments');
-    const departments = ['Engineering', 'Marketing', 'HR', 'Finance', 'Operations'];
+    // Sample Courses
+    const courseRepository = dataSource.getRepository('courses');
+    const courses = [
+      { name: 'Frontend Development', description: 'HTML, CSS, JavaScript, React', price: 1200000, duration: 4 },
+      { name: 'Backend Development', description: 'NestJS, PostgreSQL, TypeORM', price: 1500000, duration: 5 },
+      { name: 'Mobile Development', description: 'Flutter, Dart', price: 1300000, duration: 4 },
+      { name: 'UI/UX Design', description: 'Figma, Adobe XD', price: 900000, duration: 3 },
+    ];
 
-    for (const deptName of departments) {
-      const exists = await departmentRepository.findOne({ where: { name: deptName } });
+    for (const course of courses) {
+      const exists = await courseRepository.findOne({ where: { name: course.name } });
       if (!exists) {
-        await departmentRepository.save(
-          departmentRepository.create({ name: deptName, isActive: true }),
-        );
-        console.log(`✅ Department created: ${deptName}`);
+        await courseRepository.save(courseRepository.create({ ...course, status: 'ACTIVE' }));
+        console.log(`✅ Kurs yaratildi: ${course.name}`);
       }
     }
 
-    console.log('\n🎉 Seeding completed successfully!');
+    console.log('\n🎉 Seeding muvaffaqiyatli yakunlandi!');
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('❌ Seeding xatolik:', error);
     throw error;
   } finally {
     await dataSource.destroy();

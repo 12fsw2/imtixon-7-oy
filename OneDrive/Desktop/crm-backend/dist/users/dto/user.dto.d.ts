@@ -8,7 +8,6 @@ export declare class CreateUserDto {
     phone?: string;
     position?: string;
     role?: Role;
-    departmentId?: string;
 }
 declare const UpdateUserDto_base: import("@nestjs/common").Type<Partial<CreateUserDto>>;
 export declare class UpdateUserDto extends UpdateUserDto_base {
@@ -18,7 +17,6 @@ export declare class AssignRoleDto {
 }
 export declare class UserQueryDto extends PaginationQueryDto {
     role?: Role;
-    departmentId?: string;
     isActive?: string;
 }
 export {};

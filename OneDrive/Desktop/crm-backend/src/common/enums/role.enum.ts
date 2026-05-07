@@ -2,4 +2,7 @@ export enum Role {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   EMPLOYEE = 'EMPLOYEE',
+  TEACHER = 'TEACHER',
+  STUDENT = 'STUDENT',
+  CASHIER = 'CASHIER',
 }

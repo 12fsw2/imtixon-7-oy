@@ -2,11 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
 } from 'typeorm';
 import { Role } from '../../common/enums/role.enum';
 import { Exclude } from 'class-transformer';
@@ -40,19 +37,6 @@ export class User {
 
   @Column({ default: true })
   isActive: boolean;
-
-  @Column({ nullable: true })
-  departmentId: string;
-
-  @ManyToOne('Department', 'employees', { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'departmentId' })
-  department: any;
-
-  @OneToMany('Task', 'assignee')
-  assignedTasks: any[];
-
-  @OneToMany('Task', 'createdBy')
-  createdTasks: any[];
 
   @CreateDateColumn()
   createdAt: Date;

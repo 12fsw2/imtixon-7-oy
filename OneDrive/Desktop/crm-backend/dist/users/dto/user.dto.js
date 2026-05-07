@@ -59,12 +59,6 @@ __decorate([
     (0, class_validator_1.IsEnum)(role_enum_1.Role),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "role", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "departmentId", void 0);
 class UpdateUserDto extends (0, swagger_1.PartialType)(CreateUserDto) {
 }
 exports.UpdateUserDto = UpdateUserDto;
@@ -85,12 +79,6 @@ __decorate([
     (0, class_validator_1.IsEnum)(role_enum_1.Role),
     __metadata("design:type", String)
 ], UserQueryDto.prototype, "role", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], UserQueryDto.prototype, "departmentId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'true or false' }),
     (0, class_validator_1.IsOptional)(),

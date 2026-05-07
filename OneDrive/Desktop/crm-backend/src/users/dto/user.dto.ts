@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsOptional,
   IsString,
-  IsUUID,
   MinLength,
   Matches,
 } from 'class-validator';
@@ -47,11 +46,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
-  departmentId?: string;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
@@ -67,11 +61,6 @@ export class UserQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
-  departmentId?: string;
 
   @ApiPropertyOptional({ example: 'true or false' })
   @IsOptional()

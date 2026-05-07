@@ -38,11 +38,10 @@ export class UsersService {
   }
 
   async findAll(query: UserQueryDto) {
-    const { page = 1, limit = 10, search, role, departmentId, isActive, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const { page = 1, limit = 10, search, role, isActive, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
 
     const qb = this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.department', 'department')
       .select([
         'user.id',
         'user.email',
@@ -52,11 +51,8 @@ export class UsersService {
         'user.position',
         'user.role',
         'user.isActive',
-        'user.departmentId',
         'user.createdAt',
         'user.updatedAt',
-        'department.id',
-        'department.name',
       ]);
 
     if (search) {
@@ -68,10 +64,6 @@ export class UsersService {
 
     if (role) {
       qb.andWhere('user.role = :role', { role });
-    }
-
-    if (departmentId) {
-      qb.andWhere('user.departmentId = :departmentId', { departmentId });
     }
 
     if (isActive !== undefined) {
@@ -94,7 +86,6 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.department', 'department')
       .select([
         'user.id',
         'user.email',
@@ -104,11 +95,8 @@ export class UsersService {
         'user.position',
         'user.role',
         'user.isActive',
-        'user.departmentId',
         'user.createdAt',
         'user.updatedAt',
-        'department.id',
-        'department.name',
       ])
       .where('user.id = :id', { id })
       .getOne();
@@ -170,7 +158,8 @@ export class UsersService {
         `SUM(CASE WHEN user.isActive = false THEN 1 ELSE 0 END) as inactive`,
         `SUM(CASE WHEN user.role = '${Role.SUPER_ADMIN}' THEN 1 ELSE 0 END) as superAdmins`,
         `SUM(CASE WHEN user.role = '${Role.ADMIN}' THEN 1 ELSE 0 END) as admins`,
-        `SUM(CASE WHEN user.role = '${Role.EMPLOYEE}' THEN 1 ELSE 0 END) as employees`,
+        `SUM(CASE WHEN user.role = '${Role.TEACHER}' THEN 1 ELSE 0 END) as teachers`,
+        `SUM(CASE WHEN user.role = '${Role.CASHIER}' THEN 1 ELSE 0 END) as cashiers`,
       ])
       .getRawOne();
 
@@ -181,7 +170,8 @@ export class UsersService {
       byRole: {
         superAdmins: parseInt(stats.superadmins),
         admins: parseInt(stats.admins),
-        employees: parseInt(stats.employees),
+        teachers: parseInt(stats.teachers),
+        cashiers: parseInt(stats.cashiers),
       },
     };
   }

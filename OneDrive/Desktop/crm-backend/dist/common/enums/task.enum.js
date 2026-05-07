@@ -1,19 +1,44 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskPriority = exports.TaskStatus = void 0;
-var TaskStatus;
-(function (TaskStatus) {
-    TaskStatus["TODO"] = "TODO";
-    TaskStatus["IN_PROGRESS"] = "IN_PROGRESS";
-    TaskStatus["IN_REVIEW"] = "IN_REVIEW";
-    TaskStatus["DONE"] = "DONE";
-    TaskStatus["CANCELLED"] = "CANCELLED";
-})(TaskStatus || (exports.TaskStatus = TaskStatus = {}));
-var TaskPriority;
-(function (TaskPriority) {
-    TaskPriority["LOW"] = "LOW";
-    TaskPriority["MEDIUM"] = "MEDIUM";
-    TaskPriority["HIGH"] = "HIGH";
-    TaskPriority["URGENT"] = "URGENT";
-})(TaskPriority || (exports.TaskPriority = TaskPriority = {}));
+exports.StudentStatus = exports.GroupStatus = exports.CourseStatus = exports.AttendanceStatus = exports.PaymentMethod = exports.PaymentStatus = void 0;
+var PaymentStatus;
+(function (PaymentStatus) {
+    PaymentStatus["PENDING"] = "PENDING";
+    PaymentStatus["PAID"] = "PAID";
+    PaymentStatus["PARTIAL"] = "PARTIAL";
+    PaymentStatus["OVERDUE"] = "OVERDUE";
+    PaymentStatus["CANCELLED"] = "CANCELLED";
+})(PaymentStatus || (exports.PaymentStatus = PaymentStatus = {}));
+var PaymentMethod;
+(function (PaymentMethod) {
+    PaymentMethod["CASH"] = "CASH";
+    PaymentMethod["CARD"] = "CARD";
+    PaymentMethod["TRANSFER"] = "TRANSFER";
+})(PaymentMethod || (exports.PaymentMethod = PaymentMethod = {}));
+var AttendanceStatus;
+(function (AttendanceStatus) {
+    AttendanceStatus["PRESENT"] = "PRESENT";
+    AttendanceStatus["ABSENT"] = "ABSENT";
+    AttendanceStatus["LATE"] = "LATE";
+    AttendanceStatus["EXCUSED"] = "EXCUSED";
+})(AttendanceStatus || (exports.AttendanceStatus = AttendanceStatus = {}));
+var CourseStatus;
+(function (CourseStatus) {
+    CourseStatus["ACTIVE"] = "ACTIVE";
+    CourseStatus["INACTIVE"] = "INACTIVE";
+    CourseStatus["COMPLETED"] = "COMPLETED";
+})(CourseStatus || (exports.CourseStatus = CourseStatus = {}));
+var GroupStatus;
+(function (GroupStatus) {
+    GroupStatus["ACTIVE"] = "ACTIVE";
+    GroupStatus["INACTIVE"] = "INACTIVE";
+    GroupStatus["COMPLETED"] = "COMPLETED";
+})(GroupStatus || (exports.GroupStatus = GroupStatus = {}));
+var StudentStatus;
+(function (StudentStatus) {
+    StudentStatus["ACTIVE"] = "ACTIVE";
+    StudentStatus["INACTIVE"] = "INACTIVE";
+    StudentStatus["GRADUATED"] = "GRADUATED";
+    StudentStatus["EXPELLED"] = "EXPELLED";
+})(StudentStatus || (exports.StudentStatus = StudentStatus = {}));
 //# sourceMappingURL=task.enum.js.map

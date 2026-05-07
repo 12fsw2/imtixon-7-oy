@@ -19,7 +19,8 @@ export declare class UsersService {
         byRole: {
             superAdmins: number;
             admins: number;
-            employees: number;
+            teachers: number;
+            cashiers: number;
         };
     }>;
 }

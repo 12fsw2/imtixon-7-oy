@@ -13,7 +13,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('app.port') || 3000;
   const nodeEnv = configService.get<string>('app.nodeEnv');
 
   // Security
@@ -53,19 +52,21 @@ async function bootstrap() {
 
   // Swagger setup
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('CRM / SRM Backend API')
+    .setTitle('O\'quv Markaz CRM API')
     .setDescription(
       `
-## Corporate CRM/SRM Management System API
+## O'quv Markaz Boshqaruv Tizimi API
 
 ### Authentication
-- Use \`/api/v1/auth/login\` to get access token
-- Click "Authorize" button and enter JWT token (Bearer avtomatik qoshiladi)
+- \`/api/v1/auth/login\` orqali token oling
+- "Authorize" tugmasini bosib tokenni kiriting
 
-### Roles
-- **SUPER_ADMIN**: Full access - create users, assign roles, view statistics
-- **ADMIN**: Manage employees, departments, tasks, view reports  
-- **EMPLOYEE**: View own tasks and profile
+### Rollar
+- **SUPER_ADMIN**: To'liq huquq
+- **ADMIN**: Boshqaruv huquqi
+- **TEACHER**: O'qituvchi huquqi
+- **CASHIER**: Kassir huquqi
+- **STUDENT**: Talaba huquqi
       `,
     )
     .setVersion('1.0.0')
@@ -75,16 +76,20 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
-        description: 'Faqat tokenni kiriting (Bearer avtomatik qoshiladi)',
+        description: 'Faqat tokenni kiriting (Bearer avtomatik qo\'shiladi)',
         in: 'header',
       },
       'JWT-auth',
     )
-    .addTag('Authentication', 'Login and auth endpoints')
-    .addTag('Users', 'User management (Super Admin / Admin)')
-    .addTag('Departments', 'Department management')
-    .addTag('Tasks', 'Task management and tracking')
-    .addTag('Reports', 'Dashboard and reports')
+    .addTag('Authentication', 'Login va auth endpointlar')
+    .addTag('Users', 'Foydalanuvchilar boshqaruvi')
+    .addTag('Courses', 'Kurslar boshqaruvi')
+    .addTag('Students', 'Talabalar boshqaruvi')
+    .addTag('Groups', 'Guruhlar boshqaruvi')
+    .addTag('Payments', 'To\'lovlar boshqaruvi')
+    .addTag('Attendance', 'Davomat boshqaruvi')
+    .addTag('Grades', 'Baholar boshqaruvi')
+    .addTag('Reports', 'Dashboard va hisobotlar')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
@@ -97,10 +102,10 @@ async function bootstrap() {
       filter: true,
       showRequestDuration: true,
     },
-    customSiteTitle: 'CRM-SRM API Docs',
+    customSiteTitle: 'O\'quv Markaz CRM API Docs',
   });
 
-  const PORT = process.env.PORT ?? 3000;
+  const PORT = process.env.PORT ?? 4001;
 
   await app.listen(PORT, () => {
     console.log(`🚀 Root api for project: http://localhost:${PORT}/api/v1`);

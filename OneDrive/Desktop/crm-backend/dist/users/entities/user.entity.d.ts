@@ -9,10 +9,6 @@ export declare class User {
     position: string;
     role: Role;
     isActive: boolean;
-    departmentId: string;
-    department: any;
-    assignedTasks: any[];
-    createdTasks: any[];
     createdAt: Date;
     updatedAt: Date;
     get fullName(): string;

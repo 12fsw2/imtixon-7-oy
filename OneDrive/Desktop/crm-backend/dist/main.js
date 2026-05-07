@@ -13,7 +13,6 @@ async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
-    const port = configService.get('app.port') || 3000;
     const nodeEnv = configService.get('app.nodeEnv');
     app.use((0, helmet_1.default)());
     app.enableCors({
@@ -34,18 +33,20 @@ async function bootstrap() {
     app.useGlobalFilters(new global_exception_filter_1.GlobalExceptionFilter());
     app.useGlobalInterceptors(new logging_interceptor_1.LoggingInterceptor(), new common_1.ClassSerializerInterceptor(app.get(core_1.Reflector)));
     const swaggerConfig = new swagger_1.DocumentBuilder()
-        .setTitle('CRM / SRM Backend API')
+        .setTitle('O\'quv Markaz CRM API')
         .setDescription(`
-## Corporate CRM/SRM Management System API
+## O'quv Markaz Boshqaruv Tizimi API
 
 ### Authentication
-- Use \`/api/v1/auth/login\` to get access token
-- Click "Authorize" button and enter JWT token (Bearer avtomatik qoshiladi)
+- \`/api/v1/auth/login\` orqali token oling
+- "Authorize" tugmasini bosib tokenni kiriting
 
-### Roles
-- **SUPER_ADMIN**: Full access - create users, assign roles, view statistics
-- **ADMIN**: Manage employees, departments, tasks, view reports  
-- **EMPLOYEE**: View own tasks and profile
+### Rollar
+- **SUPER_ADMIN**: To'liq huquq
+- **ADMIN**: Boshqaruv huquqi
+- **TEACHER**: O'qituvchi huquqi
+- **CASHIER**: Kassir huquqi
+- **STUDENT**: Talaba huquqi
       `)
         .setVersion('1.0.0')
         .addBearerAuth({
@@ -53,14 +54,18 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
-        description: 'Faqat tokenni kiriting (Bearer avtomatik qoshiladi)',
+        description: 'Faqat tokenni kiriting (Bearer avtomatik qo\'shiladi)',
         in: 'header',
     }, 'JWT-auth')
-        .addTag('Authentication', 'Login and auth endpoints')
-        .addTag('Users', 'User management (Super Admin / Admin)')
-        .addTag('Departments', 'Department management')
-        .addTag('Tasks', 'Task management and tracking')
-        .addTag('Reports', 'Dashboard and reports')
+        .addTag('Authentication', 'Login va auth endpointlar')
+        .addTag('Users', 'Foydalanuvchilar boshqaruvi')
+        .addTag('Courses', 'Kurslar boshqaruvi')
+        .addTag('Students', 'Talabalar boshqaruvi')
+        .addTag('Groups', 'Guruhlar boshqaruvi')
+        .addTag('Payments', 'To\'lovlar boshqaruvi')
+        .addTag('Attendance', 'Davomat boshqaruvi')
+        .addTag('Grades', 'Baholar boshqaruvi')
+        .addTag('Reports', 'Dashboard va hisobotlar')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, swaggerConfig);
     swagger_1.SwaggerModule.setup('api/docs', app, document, {
@@ -72,9 +77,9 @@ async function bootstrap() {
             filter: true,
             showRequestDuration: true,
         },
-        customSiteTitle: 'CRM-SRM API Docs',
+        customSiteTitle: 'O\'quv Markaz CRM API Docs',
     });
-    const PORT = process.env.PORT ?? 3000;
+    const PORT = process.env.PORT ?? 4001;
     await app.listen(PORT, () => {
         console.log(`🚀 Root api for project: http://localhost:${PORT}/api/v1`);
         console.log(`📚 Swagger docs: http://localhost:${PORT}/api/docs`);

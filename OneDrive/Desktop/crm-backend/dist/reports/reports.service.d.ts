@@ -1,64 +1,46 @@
 import { Repository } from 'typeorm';
+import { Student } from '../students/entities/student.entity';
+import { Group } from '../groups/entities/group.entity';
+import { Payment } from '../payments/entities/payment.entity';
+import { Attendance } from '../attendance/entities/attendance.entity';
 import { User } from '../users/entities/user.entity';
-import { Task } from '../tasks/entities/task.entity';
-import { Department } from '../departments/entities/department.entity';
 export declare class ReportsService {
+    private readonly studentRepository;
+    private readonly groupRepository;
+    private readonly paymentRepository;
+    private readonly attendanceRepository;
     private readonly userRepository;
-    private readonly taskRepository;
-    private readonly departmentRepository;
-    constructor(userRepository: Repository<User>, taskRepository: Repository<Task>, departmentRepository: Repository<Department>);
+    constructor(studentRepository: Repository<Student>, groupRepository: Repository<Group>, paymentRepository: Repository<Payment>, attendanceRepository: Repository<Attendance>, userRepository: Repository<User>);
     getDashboard(): Promise<{
-        users: {
+        students: {
             total: number;
             active: number;
-            admins: number;
-            employees: number;
+            leftThisMonth: number;
             newThisMonth: number;
         };
-        tasks: {
+        teachers: {
             total: number;
-            todo: number;
-            inProgress: number;
-            done: number;
-            overdue: number;
-            createdThisMonth: number;
-            completedThisMonth: number;
         };
-        departments: {
+        groups: {
             total: number;
             active: number;
-            list: Department[];
+            completed: number;
         };
-        recentTasks: Task[];
-        topPerformers: any[];
-    }>;
-    private getUserStats;
-    private getTaskStats;
-    private getDepartmentStats;
-    private getRecentTasks;
-    private getTopPerformers;
-    getActivityReport(query: {
-        startDate?: string;
-        endDate?: string;
-        departmentId?: string;
-        page?: number;
-        limit?: number;
-    }): Promise<{
-        data: Task[];
-        meta: {
-            page: number;
-            limit: number;
+        payments: {
+            totalPaid: number;
+            totalAmount: number;
+            thisMonthPaid: number;
+            totalDebt: number;
+        };
+        monthlyStats: {
+            month: any;
             total: number;
-            totalPages: number;
-        };
+            left: number;
+        }[];
     }>;
-    getDepartmentReport(departmentId: string): Promise<{
-        department: Department;
-        taskSummary: {
-            total: number;
-            done: number;
-            inProgress: number;
-            todo: number;
-        };
-    }>;
+    private getStudentStats;
+    private getTeacherCount;
+    private getGroupStats;
+    private getPaymentStats;
+    private getMonthlyStats;
 }
